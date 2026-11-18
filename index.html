@@ -2,51 +2,107 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>bluegrassbob.com</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lawns For Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Archivo:wght@500;700&display=swap">
 <style>
+:root {
+  --sun: #fbe412;        /* poster yellow */
+  --pine: #133a1e;       /* darkest green ink */
+  --board: #fbe412;      /* sign face */
+  --board-ink: #133a1e;  /* sign lettering */
+  --shade: none;         /* image filter */
+  --display: "Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
+  --body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg: #2b2016;
-    --bg2: #3d2f1f;
-    --text: #f0e4cf;
-    --accent: #c98a3c;
+    --sun: #6b6118; --board: #1a3a20; --board-ink: #f3dc2a;
+    --shade: brightness(.58) saturate(.85) hue-rotate(-6deg); color-scheme: dark;
   }
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0;
-    height: 100%;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--sun); color: var(--pine); font-family: var(--body); overflow: hidden; }
+
+.scene { position: fixed; inset: 0; overflow: hidden; background: var(--sun); }
+.stage {
+  /* square stage covering the screen, capped so Bob + sign always fit */
+  --vh: 100vh;
+  --s: min(max(100vw, var(--vh)), calc(var(--vh) / 0.72));
+  position: absolute; width: var(--s); height: var(--s);
+  left: calc(50vw - var(--s) * 0.5);
+  top: clamp(calc(var(--vh) - var(--s)), calc(var(--vh) * 0.5 - var(--s) * 0.42), 0px);
+}
+@supports (height: 100dvh) { .stage { --vh: 100dvh; } }
+.stage img {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  filter: var(--shade);
+}
+@media (min-aspect-ratio: 13/9) {   /* soften the edges on ultra-wide screens */
+  .stage img {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+            mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
   }
-  body {
-    background: radial-gradient(circle at 50% 30%, var(--bg2), var(--bg));
-    color: var(--text);
-    font-family: Georgia, "Times New Roman", serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 16px;
-  }
-  main {
-    text-align: center;
-  }
-  h1 {
-    font-size: clamp(2rem, 8vw, 4.5rem);
-    letter-spacing: 0.02em;
-    margin: 0;
-    color: var(--accent);
-    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
-  }
-  p {
-    margin-top: 1rem;
-    font-size: 1.1rem;
-    opacity: 0.8;
-  }
+}
+
+/* The sign: top edge tucked right under Bob's forearms */
+.sign {
+  position: absolute; left: 49.6%; top: 53.6%; translate: -50% 0; rotate: -1.2deg;
+  width: calc(var(--s) * 0.38); max-width: calc(100vw - 32px);
+  background: var(--board); color: var(--board-ink);
+  border: calc(var(--s) * 0.0045) solid var(--board-ink);
+  box-shadow: calc(var(--s) * 0.007) calc(var(--s) * 0.008) 0 var(--board-ink);
+  padding: calc(var(--s) * 0.016) calc(var(--s) * 0.018) calc(var(--s) * 0.02);
+  display: grid; gap: calc(var(--s) * 0.01); justify-items: center; text-align: center;
+  animation: settle .7s cubic-bezier(.2,.9,.3,1.2) both;
+}
+.sign::before, .sign::after {   /* nail heads */
+  content: ""; position: absolute; top: calc(var(--s) * 0.012);
+  width: calc(var(--s) * 0.008); aspect-ratio: 1; border-radius: 50%; background: var(--board-ink);
+}
+.sign::before { left: calc(var(--s) * 0.012); }
+.sign::after  { right: calc(var(--s) * 0.012); }
+h1 {
+  margin: 0; font-family: var(--display); font-weight: 400; line-height: .95;
+  font-size: clamp(22px, calc(var(--s) * 0.047), 72px); letter-spacing: .01em; text-wrap: balance;
+}
+.tag {
+  margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: .16em;
+  font-size: clamp(10px, calc(var(--s) * 0.0125), 18px);
+}
+.rule { width: 70%; height: 0; border-top: calc(var(--s) * 0.0025) solid var(--board-ink); }
+.go {
+  margin-top: calc(var(--s) * 0.004);
+  font: 700 clamp(12px, calc(var(--s) * 0.014), 20px) var(--body); letter-spacing: .04em;
+  color: var(--board); background: var(--board-ink); border: 0; cursor: pointer;
+  padding: .6em 1.3em; border-radius: 999px;
+}
+.go:hover { filter: brightness(1.25); }
+.go:focus-visible { outline: 3px solid var(--board-ink); outline-offset: 3px; }
+.credit {
+  position: fixed; bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  right: max(14px, env(safe-area-inset-right, 0px)); margin: 0;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--board-ink);
+  background: var(--board); padding: 3px 8px; border: 1.5px solid var(--board-ink);
+}
+@keyframes settle { from { translate: -50% -8%; rotate: -4deg; } }
+@media (prefers-reduced-motion: reduce) { .sign { animation: none; } }
 </style>
 </head>
 <body>
-<main>
-  <h1>bluegrassbob.com</h1>
-  <p>Coming soon.</p>
+<main class="scene">
+  <div class="stage">
+    <img src="bob.webp" alt="Bluegrass Bob, a grass stalk in a bucket hat and aviators, arms crossed on a suburban lawn">
+    <div class="sign">
+      <h1>LAWNS FOR LIFE</h1>
+      <div class="rule" aria-hidden="true"></div>
+      <p class="tag">Snap it · Name it · Know it</p>
+      <button class="go" id="identify" type="button">Identify a weed</button>
+    </div>
+  </div>
+  <p class="credit">Field notes with Bluegrass Bob</p>
 </main>
 </body>
 </html>
